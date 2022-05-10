@@ -6,10 +6,10 @@
 #define CONFIG_H
 
 // Sip parameters
-const char *SipIP       = "192.168.0.200";        
+const char *SipIP       = "IPOrHostnameOfTheSIPServer";        
 const int   SipPORT     = 5060;                 
-const char *SipUSER     = "434";           
-const char *SipPW      = "nova434";
+const char *SipUSER     = "InternoSIP";           
+const char *SipPW      = "PasswordInternoSIP";
 // SIP Registration parameters
 const int SipEXPIRES   = 20;                   // registration expires in seconds; renew after SipEXPIRES/2
 
