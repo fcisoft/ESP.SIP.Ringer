@@ -5,23 +5,16 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-//
-// WiFi parameters
-//
-// WiFi SSID'S and passwords
-// the strongest WiFi station will be used
-const char* ssid = "EnterSSIDHere";
-const char* password =  "EnterPasswordHere";
-
 // Sip parameters
-const char *SipIP       = "IPOrHostnameOfTheSIPServer";        
+const char *SipIP       = "192.168.0.200";        
 const int   SipPORT     = 5060;                 
-const char *SipUSER     = "InternoSIP";           
-const char *SipPW      = "PasswordInternoSIP";
+const char *SipUSER     = "434";           
+const char *SipPW      = "nova434";
 // SIP Registration parameters
 const int SipEXPIRES   = 20;                   // registration expires in seconds; renew after SipEXPIRES/2
 
-#define ledPin D2 
-#define speakerPin D5
+#define ledPin D4 
+#define speakerPin D2
+#define resetPin D5
 
 #endif

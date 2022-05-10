@@ -1,7 +1,8 @@
 #include "Suoneria.h"
 
-Suoneria::Suoneria (byte piedino){
-      pin=piedino;
+Suoneria::Suoneria (byte piedinoSuoneria, byte piedinoLed){
+      pin=piedinoSuoneria;
+      ledPin=piedinoLed;
       init();
 }
 
@@ -19,10 +20,12 @@ void Suoneria::stopRing() {
   suona=false;
   c=0;
   t=millis();
+  digitalWrite(ledPin,HIGH);
 }
 
 void Suoneria::handle(){
   if (suona){
+    digitalWrite(ledPin,(millis()%150>50));  
     if (c<7){
         if (millis()<t+100){
           tone(pin,1400,1);
