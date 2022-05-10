@@ -11,6 +11,15 @@ char acSipIn[2048];
 char acSipOut[2048];
 Sip aSip(acSipOut, sizeof(acSipOut));
 
+
+
+// Sip parameters
+String SipIP   = "192.168.0.200";        
+String SipPORT = "5060";                 
+String SipUSER = "434";           
+String SipPW   = "nova434";   
+
+
 Suoneria ring(speakerPin, ledPin);
 
 
@@ -63,18 +72,17 @@ void setup(){
   Serial.begin(115200);
   timer1_attachInterrupt(onTime); // Add ISR Function
   timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
-  /* Dividers:
-    TIM_DIV1 = 0,   //80MHz (80 ticks/us - 104857.588 us max)
-    TIM_DIV16 = 1,  //5MHz (5 ticks/us - 1677721.4 us max)
-    TIM_DIV256 = 3  //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
-  Reloads:
-    TIM_SINGLE  0 //on interrupt routine you need to write a new value to start the timer again
-    TIM_LOOP  1 //on interrupt the counter will start with the same value again
-  */
-  
-  // Arm the Timer for our 0.5s Interval
   timer1_write(2500000); // 2500000 / 5 ticks per us from TIM_DIV16 == 500,000 us interval 
-    
+ 
+  WiFiManagerParameter sipServer("sipServer", "VoIP IP server", "0.0.0.0", 15);
+  wifiManager.addParameter(&sipServer);
+  WiFiManagerParameter sipPort("port", "port", "5060", 6);
+  wifiManager.addParameter(&sipPort);
+  WiFiManagerParameter sipUsernname("userId", "SIP Username", "", 40);
+  wifiManager.addParameter(&sipUsernname);
+  WiFiManagerParameter sipPassword("password", "SIP Password", "", 40);
+  wifiManager.addParameter(&sipPassword);
+  
   wifiManager.setDebugOutput(true);
   wifiManager.setAPCallback(configModeCallback);
   wifiManager.setConfigPortalTimeout(180);
@@ -87,10 +95,19 @@ void setup(){
   timer1_disable();   
   digitalWrite(ledPin,HIGH);
   String ip = WiFi.localIP().toString();
-  Serial.println("connesso, ip:"+ip);
+  Serial.println("Connesso, ip:"+ip);
+  SipIP=sipServer.getValue();
+  SipPORT=sipPort.getValue();
+  SipUSER=sipUsernname.getValue();
+  SipPW=sipPassword.getValue();
+  
+  Serial.println("Server SIP:"+SipIP);
+//  Serial.println("SIP Port:"+SipPORT);
+//  Serial.println("SIP Username:"+SipUSER);
+//  Serial.println("SIP Password:"+SipPW);
   digitalWrite(ledPin,HIGH);
   ip.toCharArray(WiFiIP, 16);
-  aSip.Init(SipIP, SipPORT, WiFiIP, SipPORT, SipUSER, SipPW, SipEXPIRES, 1);
+  aSip.Init(SipIP.c_str(), SipPORT.toInt(), WiFiIP, SipPORT.toInt(), SipUSER.c_str(), SipPW.c_str(), 20, 1);
   aSip.Subscribe();
   aSip.setCallCallback(callCallback);
   aSip.setCancelCallback(cancelCallback);
