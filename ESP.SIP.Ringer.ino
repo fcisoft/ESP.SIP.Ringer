@@ -14,10 +14,10 @@ Sip aSip(acSipOut, sizeof(acSipOut));
 
 
 // Sip parameters
-String SipIP   = "0.0.0.0";        
+String SipIP   = "sip.server";        
 String SipPORT = "5060";                 
-String SipUSER = "";           
-String SipPW   = "";   
+String SipUSER = "SIPRinger";           
+String SipPW   = "SIPRinger.Password";   
 
 
 Suoneria ring(speakerPin, ledPin);
@@ -74,13 +74,13 @@ void setup(){
   timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
   timer1_write(2500000); // 2500000 / 5 ticks per us from TIM_DIV16 == 500,000 us interval 
  
-  WiFiManagerParameter sipServer("sipServer", "VoIP IP server", "0.0.0.0", 15);
+  WiFiManagerParameter sipServer("sipServer", "VoIP IP server", SipIP.c_str(), 15);
   wifiManager.addParameter(&sipServer);
-  WiFiManagerParameter sipPort("port", "port", "5060", 6);
+  WiFiManagerParameter sipPort("port", "port", SipPORT.c_str(), 6);
   wifiManager.addParameter(&sipPort);
-  WiFiManagerParameter sipUsernname("userId", "SIP Username", "", 40);
+  WiFiManagerParameter sipUsernname("userId", "SIP Username", SipUSER.c_str(), 40);
   wifiManager.addParameter(&sipUsernname);
-  WiFiManagerParameter sipPassword("password", "SIP Password", "", 40);
+  WiFiManagerParameter sipPassword("password", "SIP Password", SipPW.c_str(), 40);
   wifiManager.addParameter(&sipPassword);
   
   wifiManager.setDebugOutput(true);
@@ -102,9 +102,9 @@ void setup(){
   SipPW=sipPassword.getValue();
   
   Serial.println("Server SIP:"+SipIP);
-//  Serial.println("SIP Port:"+SipPORT);
-//  Serial.println("SIP Username:"+SipUSER);
-//  Serial.println("SIP Password:"+SipPW);
+  Serial.println("SIP Port:"+SipPORT);
+  Serial.println("SIP Username:"+SipUSER);
+  Serial.println("SIP Password:"+SipPW);
   digitalWrite(ledPin,HIGH);
   ip.toCharArray(WiFiIP, 16);
   aSip.Init(SipIP.c_str(), SipPORT.toInt(), WiFiIP, SipPORT.toInt(), SipUSER.c_str(), SipPW.c_str(), 20, 1);
