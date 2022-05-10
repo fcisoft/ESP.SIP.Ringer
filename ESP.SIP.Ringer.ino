@@ -14,10 +14,10 @@ Sip aSip(acSipOut, sizeof(acSipOut));
 
 
 // Sip parameters
-String SipIP   = "192.168.0.200";        
+String SipIP   = "0.0.0.0";        
 String SipPORT = "5060";                 
-String SipUSER = "434";           
-String SipPW   = "nova434";   
+String SipUSER = "";           
+String SipPW   = "";   
 
 
 Suoneria ring(speakerPin, ledPin);
