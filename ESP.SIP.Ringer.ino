@@ -1,8 +1,10 @@
+
 #include "config.h"
 #include <WiFiManager.h>
 #include "ArduinoSIP.h"
 #include "Suoneria.h";
 #include <Ticker.h>
+#include <LittleFS.h>
 
 Ticker timer;
 WiFiManager wifiManager;
@@ -64,15 +66,51 @@ void cancelCallback(const char * from){
   ring.stopRing();
 }
 
+
+void carica(){
+  Serial.println("Carico i dati dal  FS");
+  File file = LittleFS.open("/config.txt", "r");
+  if(!file){
+    Serial.println("No Saved Data!");
+    return;
+  }
+  SipIP=file.readStringUntil('\n');
+  SipPORT=file.readStringUntil('\n');
+  SipUSER=file.readStringUntil('\n');
+  SipPW=file.readStringUntil('\n');
+  file.close();
+  Serial.print("Saved Data :\n");
+  Serial.println(SipIP+"\n"+SipPORT+"\n"+SipUSER+"\n"+SipPW);
+}
+
+
+
+void salva(){
+  LittleFS.remove("/config.txt"); 
+  delay(10);
+  File file = LittleFS.open("/config.txt", "w");
+  String s=SipIP+"\n"+SipPORT+"\n"+SipUSER+"\n"+SipPW;
+  file.print(s);
+  delay(10);
+  file.close();
+  Serial.println("Write successful");
+}
+
 void setup(){
-  pinMode(resetPin, INPUT_PULLUP);
-  WiFi.mode(WIFI_STA);  
-  pinMode(ledPin,OUTPUT);
-  digitalWrite(ledPin,LOW);
   Serial.begin(115200);
+  pinMode(resetPin, INPUT_PULLUP);
+  pinMode(ledPin,OUTPUT);
+  WiFi.mode(WIFI_STA);  
+  digitalWrite(ledPin,LOW);
   timer1_attachInterrupt(onTime); // Add ISR Function
   timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
   timer1_write(2500000); // 2500000 / 5 ticks per us from TIM_DIV16 == 500,000 us interval 
+  Serial.println("\n\n");
+  if(!LittleFS.begin()){
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
+  carica(); 
  
   WiFiManagerParameter sipServer("sipServer", "VoIP IP server", SipIP.c_str(), 15);
   wifiManager.addParameter(&sipServer);
@@ -82,7 +120,7 @@ void setup(){
   wifiManager.addParameter(&sipUsernname);
   WiFiManagerParameter sipPassword("password", "SIP Password", SipPW.c_str(), 40);
   wifiManager.addParameter(&sipPassword);
-  
+  wifiManager.setSaveConfigCallback(saveConfigCallback);
   wifiManager.setDebugOutput(true);
   wifiManager.setAPCallback(configModeCallback);
   wifiManager.setConfigPortalTimeout(180);
@@ -100,7 +138,10 @@ void setup(){
   SipPORT=sipPort.getValue();
   SipUSER=sipUsernname.getValue();
   SipPW=sipPassword.getValue();
-  
+  if (shouldSaveConfig){
+    Serial.println("Configurazione cambiata. Salvo");
+    salva();
+  }
   Serial.println("Server SIP:"+SipIP);
   Serial.println("SIP Port:"+SipPORT);
   Serial.println("SIP Username:"+SipUSER);
