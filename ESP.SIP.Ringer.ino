@@ -2,7 +2,7 @@
 #include "config.h"
 #include <WiFiManager.h>
 #include "ArduinoSIP.h"
-#include "Suoneria.h";
+#include "Suoneria.h"
 #include <Ticker.h>
 #include <LittleFS.h>
 
